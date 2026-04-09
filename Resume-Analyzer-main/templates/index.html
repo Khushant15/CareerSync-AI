@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CareerSync AI | Professional Optimizer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #020617; }
+        
+        /* Layout Redesign: Top Nav + Centered Content */
+        .navbar { 
+            height: 70px; 
+            background: rgba(15, 23, 42, 0.8); 
+            backdrop-filter: blur(12px); 
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            display: flex; 
+            align-items: center; 
+            padding: 0 5%; 
+            position: fixed; 
+            top: 0; 
+            width: 100%; 
+            z-index: 100;
+        }
+        
+        .main-wrapper { margin-top: 100px; padding: 0 5% 50px 5%; max-width: 1400px; margin-left: auto; margin-right: auto; }
+        
+        .hero-card { 
+            background: radial-gradient(circle at top right, rgba(16, 185, 129, 0.1), transparent);
+            border: 1px solid rgba(16, 185, 129, 0.2); 
+            border-radius: 30px; 
+            padding: 50px; 
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .dashboard-grid { display: grid; grid-template-columns: 350px 1fr; gap: 40px; }
+        
+        .results-panel { display: flex; flex-direction: column; gap: 30px; }
+        
+        /* Unique Result styling */
+        .glass-panel { 
+            background: rgba(30, 41, 59, 0.4); 
+            border: 1px solid rgba(255,255,255,0.05); 
+            border-radius: 20px; 
+            padding: 30px; 
+            position: relative;
+        }
+
+        .match-ring {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 8px solid rgba(16, 185, 129, 0.1);
+            border-top-color: #10b981;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin: 0 auto 20px auto;
+        }
+
+        .nav-logo { font-size: 1.5rem; font-weight: 800; background: linear-gradient(135deg, #10b981, #38bdf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        
+        .loading-overlay { display: none; position: fixed; inset: 0; background: rgba(2, 6, 23, 0.95); z-index: 1000; flex-direction: column; align-items: center; justify-content: center; }
+        .spinner { width: 60px; height: 60px; border: 5px solid rgba(16, 185, 129, 0.1); border-top-color: #10b981; border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        /* Form styling for the hero section */
+        .upload-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; max-width: 900px; margin: 30px auto 0 auto; }
+        .upload-btn { grid-column: 1 / -1; margin-top: 10px; }
+
+        .tab-nav { display: flex; flex-direction: column; gap: 10px; position: sticky; top: 120px; }
+        .side-tab { 
+            background: rgba(255,255,255,0.02); 
+            border: 1px solid transparent; 
+            padding: 15px 20px; 
+            border-radius: 12px; 
+            color: #94a3b8; 
+            text-align: left; 
+            cursor: pointer; 
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        .side-tab:hover { background: rgba(255,255,255,0.05); }
+        .side-tab.active { background: rgba(16, 185, 129, 0.1); border-color: #10b981; color: #10b981; }
+
+        .tab-pane { display: none; }
+        .tab-pane.active { display: block; animation: slideIn 0.4s ease-out; }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(10px); } to { opacity: 1; transform: translateX(0); } }
+
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="nav-logo">CareerSync AI</div>
+</nav>
+
+<div id="loading" class="loading-overlay">
+    <div class="spinner"></div>
+    <p style="margin-top: 25px; font-weight: 700; color: #10b981; letter-spacing: 2px; text-transform: uppercase;">Analyzing Career Matrix...</p>
+</div>
+
+<div class="main-wrapper">
+    <div class="hero-card">
+        <h1>Transform Your Professional Vector</h1>
+        <p style="color: #94a3b8; margin: 10px 0 30px 0;">Upload your resume and the target role to unlock advanced occupational metrics.</p>
+        
+        {% if error %}
+            <div style="background: rgba(248, 113, 113, 0.1); color: #f87171; padding: 15px; border-radius: 12px; margin-bottom: 25px; border: 1px solid rgba(248, 113, 113, 0.2); max-width: 600px; margin-left: auto; margin-right: auto;">
+                <strong>⚠️ Alert:</strong> {{ error }}
+            </div>
+        {% endif %}
+
+        <form action="/analyze" method="POST" enctype="multipart/form-data" class="upload-form" onsubmit="document.getElementById('loading').style.display='flex'">
+            <div id="drop-zone" style="padding: 20px; min-height: 50px;">
+                <p id="fileName">Drop Resume (PDF/DOCX)</p>
+                <input type="file" name="resume" id="resume" accept=".pdf,.docx" hidden required>
+            </div>
+            <select name="job_role" required>
+                <option value="" disabled selected>Target Role</option>
+                <option value="frontend">Frontend Developer</option>
+                <option value="backend">Backend Developer</option>
+                <option value="fullstack">Full Stack Developer</option>
+                <option value="mobile">Mobile App Developer (iOS/Android)</option>
+                <option value="devops">DevOps & Cloud Engineer</option>
+                <option value="cybersecurity">Cybersecurity Analyst</option>
+                <option value="data">Data Scientist / Analyst</option>
+                <option value="ml">Machine Learning Engineer</option>
+                <option value="ai">AI Research Scientist</option>
+                <option value="pm">Product Manager</option>
+                <option value="ux">UI/UX Designer</option>
+                <option value="embedded">Embedded Systems Engineer</option>
+                <option value="blockchain">Blockchain Developer</option>
+            </select>
+            <textarea name="jd" placeholder="Paste Job Description (Optional)" style="min-height: 50px;"></textarea>
+            <button type="submit" class="upload-btn">Generate Comprehensive Analysis</button>
+        </form>
+    </div>
+
+    {% if score is not none %}
+    <div class="dashboard-grid">
+        <!-- Dashboard Navigation -->
+        <div class="tab-nav">
+            <button class="side-tab active" onclick="showTab('overview', this)">Executive Summary</button>
+            <button class="side-tab" onclick="showTab('ml-metrics', this)">Mathematical Match</button>
+            <button class="side-tab" onclick="showTab('capabilities', this)">Capability Matrix</button>
+            <button class="side-tab" onclick="showTab('drafts', this)">Drafting Studio</button>
+        </div>
+
+        <!-- Dashboard Content -->
+        <div class="results-panel">
+            
+            <!-- Overview Pane -->
+            <div id="overview" class="tab-pane active">
+                <div class="glass-panel" style="margin-bottom: 25px;">
+                    <div class="match-ring">{{ score }}%</div>
+                    <p style="text-align: center; font-weight: 700; color: #94a3b8;">AGGREGATE PROFICIENCY SCORE</p>
+                </div>
+
+                <div class="section">
+                    <h3>🪄 Executive AI Summary</h3>
+                    <p style="line-height: 1.8;">{{ ai.summary if ai else "Analysis output pending..." }}</p>
+                </div>
+
+                <div class="section">
+                    <h3>🛡️ ATS Readiness Audit</h3>
+                    <p>Compliance Score: <strong style="color: #10b981;">{{ ats_score }}%</strong></p>
+                    {% if ats_warnings %}
+                        <div style="margin-top: 15px;">
+                            {% for warn in ats_warnings %}
+                                <div class="suggestion-item"><span class="suggestion-icon">⚠️</span> {{ warn }}</div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p style="color: #34d399; margin-top: 10px;">✅ Your resume is fully ATS-optimized.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- ML Metrics Pane -->
+            <div id="ml-metrics" class="tab-pane">
+                <div class="ai-card">
+                    <h3>📊 IR Model Analytics</h3>
+                    <p>{{ ml.explanation }}</p>
+                </div>
+
+                <div class="section">
+                    <h3>Feature Intersection (Matched)</h3>
+                    <div class="tags-container">
+                        {% for word in ml.matched_keywords %}
+                            <span class="tag green">{{ word }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="section" style="border-color: rgba(248, 113, 113, 0.2);">
+                    <h3>Critical Missing Features</h3>
+                    <div class="tags-container">
+                        {% for word in ml.missing_keywords %}
+                            <span class="tag red">{{ word }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h3>XAI: Keyword Significance Table</h3>
+                    <div style="overflow-x: auto;">
+                        <table style="width: 100%; text-align: left;">
+                            <thead>
+                                <tr style="color: #94a3b8; font-size: 0.85rem;">
+                                    <th style="padding: 10px;">Token</th>
+                                    <th style="padding: 10px;">Model Weight</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in ml.importance_ranking %}
+                                <tr>
+                                    <td style="padding: 10px; font-weight: 600;">{{ item.word }}</td>
+                                    <td style="padding: 10px; color: #10b981;">{{ item.score }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Capabilities Pane -->
+            <div id="capabilities" class="tab-pane">
+                <div class="chart-container" style="height: 400px;">
+                    <h3>Occupational Competency Profile</h3>
+                    <canvas id="skillBarChart" 
+                        data-technical="{{ skill_analysis.scores.technical|default(0) }}"
+                        data-soft="{{ skill_analysis.scores.soft|default(0) }}"
+                        data-tools="{{ skill_analysis.scores.tools|default(0) }}"></canvas>
+                </div>
+
+                {% for cat, skills in skill_analysis.detected.items() %}
+                <div class="section">
+                    <h4 style="text-transform: uppercase; color: #38bdf8; margin-bottom: 15px; font-size: 0.8rem;">Detected {{ cat }} Matrix</h4>
+                    <div class="tags-container">
+                        {% for s in skills %}
+                            <span class="tag green">{{ s }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Drafts Pane -->
+            <div id="drafts" class="tab-pane">
+                <div class="section">
+                    <h3>📝 AI Cover Letter Drafting Studio</h3>
+                    <pre id="coverLetterText" style="min-height: 400px; border: 1px solid rgba(255,255,255,0.05);">{{ ai.cover_letter }}</pre>
+                    <button class="print-btn" onclick="copyToClipboard()" style="width: 100%;">Copy Studio Output to Clipboard</button>
+                    <button class="print-btn" onclick="window.print()" style="width: 100%; margin-top: 10px; background: rgba(56, 189, 248, 0.1); color: #38bdf8; border-color: rgba(56, 189, 248, 0.2);">Export Complete Analytics Report</button>
+                </div>
+
+                <div class="section">
+                    <h3>🎤 Technical & Behavioral Simulations</h3>
+                    <div class="suggestions-list">
+                        {% for q in ai.questions %}
+                            <div class="suggestion-item">
+                                <span class="suggestion-icon">💬</span> <span>{{ q }}</span>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+const dropZone = document.getElementById("drop-zone");
+const fileInput = document.getElementById("resume");
+const fileName = document.getElementById("fileName");
+
+if(dropZone){
+    dropZone.onclick = () => fileInput.click();
+    fileInput.onchange = () => { fileName.textContent = fileInput.files[0].name; };
+}
+
+function showTab(id, el) {
+    document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.side-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    el.classList.add('active');
+}
+
+function copyToClipboard() {
+    const text = document.getElementById('coverLetterText').innerText;
+    if (navigator.clipboard) {
+        navigator.clipboard.writeText(text).then(() => alert('Copied!')).catch(() => fallbackCopy(text));
+    } else {
+        fallbackCopy(text);
+    }
+}
+
+function fallbackCopy(text) {
+    const textArea = document.createElement("textarea");
+    textArea.value = text;
+    document.body.appendChild(textArea);
+    textArea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textArea);
+    alert('Copied!');
+}
+
+    const canvas = document.getElementById('skillBarChart');
+    if (canvas) {
+        const ctx = canvas.getContext('2d');
+        const tech = parseFloat(canvas.dataset.technical) || 0;
+        const soft = parseFloat(canvas.dataset.soft) || 0;
+        const tools = parseFloat(canvas.dataset.tools) || 0;
+
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Technical', 'Soft Skills', 'Tools'],
+                datasets: [{
+                    data: [tech, soft, tools],
+                    backgroundColor: ['#10b981', '#38bdf8', '#fbbf24'],
+                    borderRadius: 10
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: { x: { grid: { color: 'rgba(255,255,255,0.05)' }, max: 100 } }
+            }
+        });
+    }
+</script>
+
+</body>
+</html>
