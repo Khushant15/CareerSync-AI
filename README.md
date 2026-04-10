@@ -22,6 +22,18 @@ CareerSync AI is a sophisticated Flask-based web application designed to help jo
     - **Drafting Studio**: AI-generated cover letters optimized for specific roles.
 - **Dynamic Dashboard**: Interactive visualizations powered by Chart.js for competency profiling.
 - **Modern UI**: A premium, "liquid glass" interface designed for maximum user engagement.
+- **Visual Analytics**: Real-time competency profiling and data visualization.
+
+## 📸 Visual Preview
+
+| Landing Page | Executive Summary |
+|:---:|:---:|
+| ![Landing](assets/screenshots/landing.png) | ![Summary](assets/screenshots/summary.png) |
+
+| Capability Matrix | Drafting Studio |
+|:---:|:---:|
+| ![Matrix](assets/screenshots/matrix.png) | ![Drafting](assets/screenshots/drafting.png) |
+
 
 ## 📁 Project Structure
 
