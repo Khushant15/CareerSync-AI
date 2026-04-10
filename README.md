@@ -1,6 +1,14 @@
 # CareerSync AI | Professional Resume & ATS Optimizer
 
+[![Netlify Status](https://img.shields.io/website?url=https%3A%2F%2Faicareersync.netlify.app%2F&label=Netlify)](https://aicareersync.netlify.app/)
+[![Render Status](https://img.shields.io/website?url=https%3A%2F%2Fcareersync-ai-rbkp.onrender.com&label=Render)](https://careersync-ai-rbkp.onrender.com)
+
 CareerSync AI is a sophisticated Flask-based web application designed to help job seekers optimize their resumes using hybrid AI analysis. It combines traditional Machine Learning (TF-IDF) with modern LLM-driven insights (Groq/Llama-3) to provide a comprehensive evaluation of career documents.
+
+## 🔗 Live Demo
+- **Netlify (Main URL)**: [https://aicareersync.netlify.app/](https://aicareersync.netlify.app/)
+- **Render (App Engine)**: [https://careersync-ai-rbkp.onrender.com](https://careersync-ai-rbkp.onrender.com)
+
 
 ## 🚀 Features
 
@@ -46,8 +54,8 @@ CareerSync AI is a sophisticated Flask-based web application designed to help jo
 
 1. **Clone the repository**:
    ```bash
-   git clone <repository-url>
-   cd Resume-Analyzer-main
+   git clone https://github.com/Khushant15/CareerSync-AI.git
+   cd CareerSync-AI
    ```
 
 2. **Set up a virtual environment**:
