@@ -7,3 +7,4 @@ python-dotenv
 scikit-learn
 nltk
 numpy
+gunicorn

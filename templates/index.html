@@ -254,13 +254,14 @@
                 {% endfor %}
             </div>
 
-            <!-- Drafts Pane -->
             <div id="drafts" class="tab-pane">
                 <div class="section">
                     <h3>📝 AI Cover Letter Drafting Studio</h3>
-                    <pre id="coverLetterText" style="min-height: 400px; border: 1px solid rgba(255,255,255,0.05);">{{ ai.cover_letter }}</pre>
-                    <button class="print-btn" onclick="copyToClipboard()" style="width: 100%;">Copy Studio Output to Clipboard</button>
-                    <button class="print-btn" onclick="window.print()" style="width: 100%; margin-top: 10px; background: rgba(56, 189, 248, 0.1); color: #38bdf8; border-color: rgba(56, 189, 248, 0.2);">Export Complete Analytics Report</button>
+                    <div id="coverLetterText">{{ ai.cover_letter }}</div>
+                    <div class="studio-actions">
+                        <button class="print-btn studio-btn" onclick="copyToClipboard()">Copy to Clipboard</button>
+                        <button class="print-btn studio-btn" onclick="window.print()" style="background: rgba(56, 189, 248, 0.1); color: #38bdf8; border-color: rgba(56, 189, 248, 0.2);">Export PDF Report</button>
+                    </div>
                 </div>
 
                 <div class="section">
