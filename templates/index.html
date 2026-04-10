@@ -93,6 +93,22 @@
         .tab-pane { display: none; }
         .tab-pane.active { display: block; animation: slideIn 0.4s ease-out; }
         @keyframes slideIn { from { opacity: 0; transform: translateX(10px); } to { opacity: 1; transform: translateX(0); } }
+        @media (max-width: 768px) {
+            .navbar { padding: 0 20px; }
+            .nav-logo { font-size: 1.2rem; }
+            .main-wrapper { margin-top: 80px; padding: 0 20px 30px 20px; }
+            .hero-card { padding: 30px 20px; border-radius: 20px; }
+            .dashboard-grid { grid-template-columns: 1fr; gap: 20px; }
+            .tab-nav { flex-direction: row; overflow-x: auto; position: static; white-space: nowrap; padding-bottom: 10px; }
+            .side-tab { text-align: center; flex: 0 0 auto; padding: 10px 15px; font-size: 0.9rem; }
+            .glass-panel { padding: 20px; }
+            .chart-container { height: 300px !important; }
+            .upload-form { grid-template-columns: 1fr; }
+        }
+
+        /* Hide scrollbar for tab-nav on mobile for cleaner look */
+        .tab-nav::-webkit-scrollbar { display: none; }
+        .tab-nav { -ms-overflow-style: none; scrollbar-width: none; }
 
     </style>
 </head>
